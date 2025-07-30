@@ -200,18 +200,19 @@
                 hyphens: auto;
             }
             
-            /* Optimize carousel for mobile - fill container with zoom capability */
+            /* Optimize carousel for mobile - show full images with zoom capability */
             .carousel-wrapper {
                 height: 400px; /* Increased height for better image display */
                 margin: 1rem 0;
             }
             
             .carousel-item img {
-                object-fit: cover; /* Fill the container completely */
+                object-fit: contain; /* Show full image without cropping */
                 width: 100%;
                 height: 100%;
                 border-radius: 0.5rem;
                 transition: transform 0.3s ease;
+                transform-origin: center center;
             }
             
             .carousel-button {
@@ -331,11 +332,12 @@
             }
             
             .carousel-item img {
-                object-fit: cover; /* Fill the container completely */
+                object-fit: contain; /* Show full image without cropping */
                 width: 100%;
                 height: 100%;
                 border-radius: 0.5rem;
                 transition: transform 0.3s ease;
+                transform-origin: center center;
             }
             
             .text-4xl {
@@ -933,7 +935,7 @@
                             e.touches[0].clientY - e.touches[1].clientY
                         );
                         const scale = (distance / startDistance) * startScale;
-                        currentScale = Math.min(Math.max(scale, 0.5), 3);
+                        currentScale = Math.min(Math.max(scale, 0.3), 5); // Allow more zoom range
                         img.style.transform = `scale(${currentScale})`;
                         console.log('Zoom scale:', currentScale);
                     }
@@ -969,12 +971,44 @@
                         img.style.transform = 'scale(1)';
                     }
                 });
+                
+                // Add a reset function that can be called externally
+                img.resetZoom = function() {
+                    currentScale = 1;
+                    img.style.transform = 'scale(1)';
+                    console.log('Zoom reset to 1x');
+                };
             });
         }
 
         document.addEventListener('DOMContentLoaded', function() {
             initializeSliders(); // Initialize all sliders
             addImageZoom(); // Initialize image zoom functionality
+            
+            // Add a reset button for testing
+            const resetButton = document.createElement('button');
+            resetButton.textContent = 'Reset All Zoom';
+            resetButton.style.cssText = `
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                z-index: 1000;
+                background: rgba(0,0,0,0.7);
+                color: white;
+                border: none;
+                padding: 8px 12px;
+                border-radius: 4px;
+                font-size: 12px;
+            `;
+            resetButton.addEventListener('click', function() {
+                const carouselImages = document.querySelectorAll('.carousel-item img');
+                carouselImages.forEach(img => {
+                    if (img.resetZoom) {
+                        img.resetZoom();
+                    }
+                });
+            });
+            document.body.appendChild(resetButton);
 
             // Fade-in on scroll logic
             const faders = document.querySelectorAll('.fade-in');
