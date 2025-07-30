@@ -200,19 +200,19 @@
                 hyphens: auto;
             }
             
-            /* Optimize carousel for mobile - scale images without rotation */
+            /* Optimize carousel for mobile - show full images with zoom capability */
             .carousel-wrapper {
-                height: 300px; /* Reduced height for better mobile viewing */
+                height: 400px; /* Increased height for better image display */
                 margin: 1rem 0;
             }
             
             .carousel-item img {
-                object-fit: cover; /* Fill the frame horizontally */
+                object-fit: contain; /* Show full image without cropping */
                 width: 100%;
                 height: 100%;
                 border-radius: 0.5rem;
-                transform: scale(1.2); /* Scale up images without rotation */
-                transform-origin: center center; /* Ensure scaling from center */
+                max-height: 100%;
+                max-width: 100%;
             }
             
             .carousel-button {
@@ -332,12 +332,12 @@
             }
             
             .carousel-item img {
-                object-fit: cover; /* Fill the frame horizontally */
+                object-fit: contain; /* Show full image without cropping */
                 width: 100%;
                 height: 100%;
                 border-radius: 0.5rem;
-                transform: scale(1.2); /* Scale up images without rotation */
-                transform-origin: center center; /* Ensure scaling from center */
+                max-height: 100%;
+                max-width: 100%;
             }
             
             .text-4xl {
@@ -900,9 +900,64 @@
                 mobileMenu.classList.add('hidden');
             }
         });
+        
+        // Image zoom functionality for mobile
+        function addImageZoom() {
+            const carouselImages = document.querySelectorAll('.carousel-item img');
+            carouselImages.forEach(img => {
+                let currentScale = 1;
+                let startDistance = 0;
+                let startScale = 1;
+                
+                // Touch events for zoom
+                img.addEventListener('touchstart', function(e) {
+                    if (e.touches.length === 2) {
+                        startDistance = Math.hypot(
+                            e.touches[0].clientX - e.touches[1].clientX,
+                            e.touches[0].clientY - e.touches[1].clientY
+                        );
+                        startScale = currentScale;
+                    }
+                });
+                
+                img.addEventListener('touchmove', function(e) {
+                    if (e.touches.length === 2) {
+                        e.preventDefault();
+                        const distance = Math.hypot(
+                            e.touches[0].clientX - e.touches[1].clientX,
+                            e.touches[0].clientY - e.touches[1].clientY
+                        );
+                        const scale = (distance / startDistance) * startScale;
+                        currentScale = Math.min(Math.max(scale, 0.5), 3); // Limit zoom between 0.5x and 3x
+                        img.style.transform = `scale(${currentScale})`;
+                    }
+                });
+                
+                img.addEventListener('touchend', function(e) {
+                    if (e.touches.length < 2) {
+                        startDistance = 0;
+                        startScale = 1;
+                    }
+                });
+                
+                // Double tap to reset zoom
+                let lastTap = 0;
+                img.addEventListener('touchend', function(e) {
+                    const currentTime = new Date().getTime();
+                    const tapLength = currentTime - lastTap;
+                    if (tapLength < 500 && tapLength > 0) {
+                        // Double tap detected
+                        currentScale = 1;
+                        img.style.transform = 'scale(1)';
+                    }
+                    lastTap = currentTime;
+                });
+            });
+        }
 
         document.addEventListener('DOMContentLoaded', function() {
             initializeSliders(); // Initialize all sliders
+            addImageZoom(); // Initialize image zoom functionality
 
             // Fade-in on scroll logic
             const faders = document.querySelectorAll('.fade-in');
