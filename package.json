@@ -4,8 +4,8 @@
   "description": "Expert-AI Collaborative Intelligent Decision-making Platform",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js",
+    "start": "node simple-server.js",
+    "dev": "node simple-server.js",
     "static": "node static-server.js"
   },
   "dependencies": {
