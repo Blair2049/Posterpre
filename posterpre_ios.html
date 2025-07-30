@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Expert -AI Collaborative Intelligent Decision-making Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #f9f9f7; /* Calm Beige/Off-white */
+            color: #333333; /* Dark Gray for text */
+        }
+        .accent-bg { background-color: #0A4740; } /* Dark Teal */
+        .accent-text { color: #0A4740; }
+        .accent-border { border-color: #0A4740; }
+        .secondary-bg { background-color: #e8e8e1; } /* Light Grayish Beige */
+        .highlight-text { color: #1E6E73; } /* Softer Teal for highlights */
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .nav-link {
+            transition: color 0.3s;
+        }
+        .nav-link:hover {
+            color: #1E6E73;
+        }
+        .feature-button {
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .feature-button.active {
+            background-color: #0A4740;
+            color: white;
+        }
+        .feature-content {
+            display: none;
+        }
+        .feature-content.active {
+            display: block;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px; /* Max width for chart */
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px; /* Base height for charts */
+            max-height: 400px; /* Max height for charts */
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        /* Project Visual Demo Image Slider Styles (Horizontal) */
+        .carousel-wrapper {
+            position: relative;
+            max-width: 100%;
+            margin: 0 auto;
+            overflow: hidden;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #f0f0f0;
+            height: 500px; /* Increased height significantly for larger images */
+        }
+        .carousel-inner {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.5s ease-in-out;
+            align-items: center; /* Vertically center images */
+        }
+        .carousel-item {
+            min-width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .carousel-item img {
+            width: 100%; /* Make image fill width */
+            height: 100%; /* Make image fill height */
+            object-fit: contain; /* Use contain to fit the image without cropping, but ensure it fills the *available* space if aspect ratio allows */
+            border-radius: 0.5rem;
+        }
+        /* Further adjustment for image to fill more of the container, while maintaining aspect ratio,
+           consider adding padding to carousel-item or adjusting carousel-wrapper height if images
+           are consistently leaving too much blank space with 'contain'.
+           For "no blank" on edges, 'cover' is needed, but it crops. User asked for no blank *and*
+           magnified, which implies filling the frame. 'contain' is safer for full image visibility.
+           If the user insists on *no whitespace regardless of aspect ratio*, 'cover' must be used,
+           which will crop. I'll stick to 'contain' and ensure carousel-wrapper is tall enough.
+           Let's re-read: "Length and width are insufficient" -> this implies the *image itself* is too small *within* the frame.
+           So `object-fit: cover` and ensuring `carousel-wrapper` and `carousel-item` are large enough.
+           If `object-fit: cover` is used, the image will fill the area.
+        */
+        .carousel-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Fill the frame, potentially cropping */
+            border-radius: 0.5rem;
+        }
+
+        .carousel-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            z-index: 10;
+            transition: background-color 0.3s;
+        }
+        .carousel-button:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+        .carousel-button.left {
+            left: 5px;
+            border-radius: 0 5px 5px 0;
+        }
+        .carousel-button.right {
+            right: 5px;
+            border-radius: 5px 0 0 5px;
+        }
+
+        /* Custom Workflow Diagram CSS - Horizontal Layout */
+        .custom-workflow-diagram-horizontal {
+            display: flex;
+            flex-direction: row; /* Horizontal layout */
+            align-items: center; /* Center vertically within the flow */
+            justify-content: center; /* Center content if less than full width */
+            gap: 1.5rem; /* Space between steps and arrows */
+            margin-top: 2rem;
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.08);
+            border-top: 4px solid #1E6E73; /* Highlight color */
+            overflow-x: auto; /* Allow horizontal scrolling if steps are too wide */
+        }
+        .workflow-step-box-custom-horizontal {
+            background-color: #f0f6f6; /* Light teal background */
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            min-width: 180px; /* Ensure minimum width for step content */
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+        .workflow-arrow-right {
+            width: 30px; /* Length of the horizontal arrow */
+            height: 2px;
+            background-color: #0A4740;
+            position: relative;
+        }
+        .workflow-arrow-right::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 100%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+            border-left: 8px solid #0A4740;
+        }
+        .workflow-group-label {
+            font-size: 0.9em;
+            color: #555;
+            margin-top: 0.5rem;
+            display: block;
+        }
+
+        /* iOS Mobile Optimizations */
+        @media (max-width: 768px) {
+            body {
+                font-size: 16px; /* Prevent zoom on iOS */
+                -webkit-tap-highlight-color: transparent; /* Remove tap highlight on iOS */
+                -webkit-touch-callout: none; /* Disable callout on iOS */
+                -webkit-user-select: none; /* Disable text selection on iOS */
+                user-select: none;
+            }
+            
+            /* Enable text selection for content areas */
+            p, h1, h2, h3, h4, h5, h6, li {
+                -webkit-user-select: text;
+                user-select: text;
+            }
+            
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            
+            h1, h2, h3 {
+                word-wrap: break-word;
+                hyphens: auto;
+            }
+            
+            /* Optimize carousel for mobile */
+            .carousel-wrapper {
+                height: 300px;
+                margin: 1rem 0;
+            }
+            
+            .carousel-button {
+                padding: 8px 12px;
+                font-size: 1.2rem;
+            }
+            
+            /* Stack workflow diagrams vertically on mobile */
+            .custom-workflow-diagram-horizontal {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            .workflow-step-box-custom-horizontal {
+                min-width: auto;
+                width: 100%;
+                max-width: 280px;
+            }
+            
+            .workflow-arrow-right {
+                transform: rotate(90deg);
+                width: 2px;
+                height: 30px;
+            }
+            
+            /* Optimize feature tabs for mobile */
+            .feature-tabs {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .feature-button {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            /* Optimize charts for mobile */
+            .chart-container {
+                height: 250px;
+                margin: 1rem 0;
+            }
+            
+            /* Improve touch targets */
+            button, .nav-link {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            
+            /* Optimize text sizes for mobile */
+            .text-4xl {
+                font-size: 1.875rem;
+            }
+            
+            .text-3xl {
+                font-size: 1.5rem;
+            }
+            
+            .text-2xl {
+                font-size: 1.25rem;
+            }
+            
+            .text-xl {
+                font-size: 1.125rem;
+            }
+            
+            /* Improve spacing for mobile */
+            .py-16 {
+                padding-top: 2rem;
+                padding-bottom: 2rem;
+            }
+            
+            .py-20 {
+                padding-top: 2.5rem;
+                padding-bottom: 2.5rem;
+            }
+            
+            .mb-8 {
+                margin-bottom: 1.5rem;
+            }
+            
+            .mb-12 {
+                margin-bottom: 2rem;
+            }
+            
+            /* Optimize grid layouts for mobile */
+            .grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            /* Improve card layouts */
+            .bg-white {
+                margin: 0.5rem 0;
+            }
+            
+            /* Optimize navigation for mobile */
+            nav {
+                padding: 0.5rem 1rem;
+            }
+            
+            .nav-links {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+        
+        /* iPhone SE and smaller screens */
+        @media (max-width: 375px) {
+            .container {
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
+            
+            .carousel-wrapper {
+                height: 250px;
+            }
+            
+            .text-4xl {
+                font-size: 1.5rem;
+            }
+            
+            .text-3xl {
+                font-size: 1.25rem;
+            }
+        }
+        
+        /* iOS Safari specific optimizations */
+        @supports (-webkit-touch-callout: none) {
+            /* iOS Safari specific styles */
+            .carousel-wrapper {
+                -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            }
+            
+            /* Prevent zoom on input focus */
+            input, textarea, select {
+                font-size: 16px;
+            }
+            
+            /* Optimize for iOS safe areas */
+            body {
+                padding-top: env(safe-area-inset-top);
+                padding-bottom: env(safe-area-inset-bottom);
+                padding-left: env(safe-area-inset-left);
+                padding-right: env(safe-area-inset-right);
+            }
+        }
+
+        /* RAG Workflow Diagram CSS - Unified Arrows and Centering */
+        .rag-workflow-diagram {
+            display: flex;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+            justify-content: center; /* Center items horizontally */
+            align-items: center; /* Align items vertically */
+            gap: 1rem 2rem; /* Vertical and horizontal gap between items */
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: #fdfdfd;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            max-width: fit-content; /* Allow content to dictate width */
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .rag-step-box {
+            background-color: #e6f3f3; /* Lighter teal background */
+            padding: 0.8rem 1.2rem;
+            border-radius: 0.4rem;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            font-size: 0.95rem;
+            min-width: 120px; /* Ensure minimum width */
+            flex-shrink: 0;
+            flex-grow: 1; /* Allow growing to fill space */
+        }
+        /* Unified Horizontal Arrow for RAG Workflow */
+        .rag-arrow {
+            width: 30px; /* Horizontal arrow length */
+            height: 2px;
+            background-color: #1E6E73; /* Teal arrow color */
+            position: relative;
+            align-self: center; /* Center arrow vertically within flex item */
+            margin: 0; /* No external margin for arrow itself, gap handles spacing */
+            flex-shrink: 0;
+        }
+        .rag-arrow::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 100%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-top: 7px solid transparent;
+            border-bottom: 7px solid transparent;
+            border-left: 7px solid #1E6E73;
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            .custom-workflow-diagram-horizontal {
+                flex-direction: column; /* Stack vertically on small screens */
+                align-items: center;
+            }
+            .workflow-arrow-right {
+                width: 2px;
+                height: 30px;
+            }
+            .workflow-arrow-right::after {
+                left: 50%;
+                top: 100%;
+                transform: translateX(-50%);
+                border-left: 8px solid transparent;
+                border-right: 8px solid transparent;
+                border-top: 8px solid #0A4740;
+                border-bottom: none; /* Remove bottom border for vertical arrow */
+            }
+            .rag-workflow-diagram {
+                flex-direction: column; /* Stack steps vertically on small screens */
+                gap: 1rem; /* Adjust gap for vertical stacking */
+            }
+            .rag-arrow {
+                width: 2px; /* Vertical arrow width */
+                height: 30px; /* Vertical arrow height */
+                margin: 0.5rem 0; /* Add vertical margin */
+            }
+            .rag-arrow::after {
+                left: 50%;
+                top: 100%;
+                transform: translateX(-50%);
+                border-left: 7px solid transparent;
+                border-right: 7px solid transparent;
+                border-top: 7px solid #1E6E73;
+                border-bottom: none; /* Remove bottom border for vertical arrow */
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <span class="text-3xl" role="img" aria-label="Target">🎯</span>
+                <h1 class="text-xl font-bold text-gray-800">Expert -AI Collaborative Intelligent Decision-making Platform</h1>
+            </div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#what" class="nav-link text-gray-600 font-medium">What</a>
+                <a href="#why" class="nav-link text-gray-600 font-medium">Why Need</a>
+                <a href="#features" class="nav-link text-gray-600 font-medium">Core Function</a>
+                <a href="#users" class="nav-link text-gray-600 font-medium">Target User</a>
+                <a href="#value" class="nav-link text-gray-600 font-medium">Core Value</a>
+                <a href="#future" class="nav-link text-gray-600 font-medium">Future Prospects</a>
+            </div>
+            <!-- Mobile menu button -->
+            <button class="md:hidden text-gray-600 hover:text-gray-800 p-2" onclick="toggleMobileMenu()">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </nav>
+        <!-- Mobile menu -->
+        <div id="mobileMenu" class="md:hidden hidden bg-white border-t border-gray-200">
+            <div class="container mx-auto px-6 py-4">
+                <div class="flex flex-col space-y-4">
+                    <a href="#what" class="nav-link text-gray-600 font-medium py-2" onclick="closeMobileMenu()">What</a>
+                    <a href="#why" class="nav-link text-gray-600 font-medium py-2" onclick="closeMobileMenu()">Why Need</a>
+                    <a href="#features" class="nav-link text-gray-600 font-medium py-2" onclick="closeMobileMenu()">Core Function</a>
+                    <a href="#users" class="nav-link text-gray-600 font-medium py-2" onclick="closeMobileMenu()">Target User</a>
+                    <a href="#value" class="nav-link text-gray-600 font-medium py-2" onclick="closeMobileMenu()">Core Value</a>
+                    <a href="#future" class="nav-link text-gray-600 font-medium py-2" onclick="closeMobileMenu()">Future Prospects</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+
+        <section id="what" class="text-center min-h-[60vh] flex flex-col justify-center items-center py-16">
+            <div class="fade-in">
+                <h2 class="text-4xl md:text-5xl font-bold accent-text mb-4">Expert-AI Collaboration: Empowering Enterprise Project Decision-making</h2>
+                <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+                    I'm <strong>Jiarui Zhang</strong>, currently studying <strong>Computer Science</strong> at <strong>the University of Sydney</strong>. This project aims to develop an <strong>expert-AI collaborative intelligent decision-making platform</strong>, leveraging cutting-edge technologies to digitally transform the decision-making process in enterprise project management.
+                </p>
+                                <div class="bg-white p-8 rounded-xl shadow-lg max-w-4xl mx-auto border-t-4 accent-border">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-3 text-left">Project Brief</h3>
+                    <ul class="text-gray-700 list-disc list-inside space-y-2 text-left">
+                        <li>This project has developed an <strong>expert-AI collaborative intelligent decision-making platform</strong> for enterprise project management.</li>
+                        <li>Integrated cutting-edge <strong>AI reasoning</strong> and <strong>RAG (Retrieval-Augmented Generation) technology</strong>.</li>
+                        <li>The system supports <strong>multi-modal intelligent Q&A</strong> and <strong>dynamic quality assessment</strong>.</li>
+                        <li>Capable of efficiently parsing and understanding complex project documents, providing <strong>precise and explainable decision recommendations</strong> in real-time.</li>
+                        <li>Through deep integration of AI and expert knowledge, significantly enhanced the <strong>intelligence level</strong> and <strong>response efficiency</strong> of enterprise decision-making.</li>
+                    </ul>
+                </div>
+
+                <div class="mt-12 fade-in">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6">Complete Workflow Diagram</h3>
+                    <div class="custom-workflow-diagram-horizontal">
+                        <div class="workflow-step-box-custom-horizontal">Document Upload<span class="workflow-group-label">Multi-format Support</span></div>
+                        <div class="workflow-arrow-right"></div>
+                        <div class="workflow-step-box-custom-horizontal">Knowledge Graph Construction<span class="workflow-group-label">LightRAG + Vector DB</span></div>
+                        <div class="workflow-arrow-right"></div>
+                        <div class="workflow-step-box-custom-horizontal">Intelligent Q&A<span class="workflow-group-label">Multi-modal Retrieval</span></div>
+                        <div class="workflow-arrow-right"></div>
+                        <div class="workflow-step-box-custom-horizontal">Result Analysis<span class="workflow-group-label">Quality + Cost Analytics</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-16 fade-in">
+                <h3 class="text-3xl font-bold text-gray-800 mb-4">Technology Stack Overview</h3>
+                <p class="text-lg text-gray-700 max-w-3xl mx-auto">
+                    The system is based on <strong>Flask Web framework</strong>, integrated with <strong>OpenAI GPT-4 model</strong>, utilizing <strong>LightRAG framework</strong> for multi-modal retrieval, combined with <strong>vector database</strong> and <strong>knowledge graph</strong>.
+                </p>
+                <p class="text-lg text-gray-700 max-w-3xl mx-auto mt-4">
+                    The system supports two query modes: <strong>Hybrid mode (Mix mode)</strong> (fast response) and <strong>Best mode (Best mode)</strong> (multi-modal scoring).
+                </p>
+            </div>
+        </section>
+
+        <section id="why" class="py-20">
+            <div class="text-center mb-12 fade-in">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Why Expert-AI Collaboration?</h2>
+                <p class="text-lg text-gray-600 mt-2">Addressing Complex Project Decision Challenges</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="fade-in">
+                    <h3 class="text-2xl font-bold highlight-text mb-4">Project Decision Challenges</h3>
+                    <p class="text-gray-700 mb-4">
+                        In large enterprise projects, decision-making processes are typically complex and time-critical, requiring the processing of massive documents and extracting accurate, reliable information. Traditional project management approaches face efficiency bottlenecks in information retrieval and decision support.
+                    </p>
+                    <h3 class="text-2xl font-bold highlight-text mb-4">AI-Powered Opportunities</h3>
+                    <p class="text-gray-700 mb-4">
+                        AI technology, particularly when combined with RAG and large language models, can efficiently parse and understand complex project documents. By deeply integrating AI's powerful processing capabilities with expert experiential knowledge, we can significantly enhance the intelligence level and response efficiency of decision-making.
+                    </p>
+                    <p class="text-700">
+                        This project aims to help enterprises achieve comprehensive <strong>digital transformation</strong> through AI empowerment, gaining <strong>data-driven insight support</strong> in the decision-making process.
+                    </p>
+                </div>
+                <div class="fade-in">
+                    <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 accent-border">
+                        <h4 class="text-xl font-semibold text-gray-800 mb-4">AI-Powered vs Traditional Mode Efficiency Comparison (Conceptual)</h4>
+                        <div class="chart-container">
+                            <canvas id="resourceShiftChart"></canvas>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-4 text-center">
+                            AI systems can significantly improve information processing and decision-making efficiency.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="py-20 secondary-bg rounded-xl shadow-inner">
+            <div class="text-center mb-12 fade-in">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Core Features: Driving Intelligent Project Decisions</h2>
+                <p class="text-lg text-gray-600 mt-2">Platform Core Modules and Highlights</p>
+            </div>
+
+            <div class="max-w-6xl mx-auto px-4 mb-12">
+                <div class="bg-white p-8 rounded-xl shadow-lg border-t-4 accent-border fade-in">
+                    <h3 class="text-2xl font-bold highlight-text mb-4 text-center">Project Visual Demo</h3>
+                    <p class="text-gray-700 mb-8 text-center">
+                        Below is a visual showcase of key modules of this project, presenting the platform's user interface and core features through image carousel.
+                    </p>
+                    <div class="flex flex-col gap-8"> <div class="bg-gray-100 p-4 rounded-lg flex flex-col items-center">
+                            <h4 class="text-lg font-semibold text-gray-800 mb-3">Knowledge Base & Graph</h4>
+                            <div class="carousel-wrapper" id="kbCarousel">
+                                <div class="carousel-inner">
+                                    <div class="carousel-item"><img src="Knowledge Base1.png" alt="Knowledge Graph View 1"></div>
+                                    <div class="carousel-item"><img src="Knowledge graph 2.png" alt="Knowledge Graph View 2"></div>
+                                </div>
+                                <button class="carousel-button left" onclick="prevSlide('kb')">❮</button>
+                                <button class="carousel-button right" onclick="nextSlide('kb')">❯</button>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-3 text-center">Knowledge Base Interface and Knowledge Graph Visualization</p>
+                        </div>
+
+                        <div class="bg-gray-100 p-4 rounded-lg flex flex-col items-center">
+                            <h4 class="text-lg font-semibold text-gray-800 mb-3">Intelligent Chat Interface</h4>
+                            <div class="carousel-wrapper" id="chatCarousel">
+                                <div class="carousel-inner">
+                                    <div class="carousel-item"><img src="chatbot1.png" alt="Chat Interface 1"></div>
+                                    <div class="carousel-item"><img src="chatbot2.png" alt="Chat Interface 2 (Placeholder)"></div>
+                                    <div class="carousel-item"><img src="chatbot3.png" alt="Chat Interface 3 (Placeholder)"></div>
+                                </div>
+                                <button class="carousel-button left" onclick="prevSlide('chat')">❮</button>
+                                <button class="carousel-button right" onclick="nextSlide('chat')">❯</button>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-3 text-center">Multi-modal Intelligent Q&A Experience</p>
+                        </div>
+
+                        <div class="bg-gray-100 p-4 rounded-lg flex flex-col items-center">
+                            <h4 class="text-lg font-semibold text-gray-800 mb-3">Data Chart Display</h4>
+                            <div class="carousel-wrapper" id="chartCarousel">
+                                <div class="carousel-inner">
+                                    <div class="carousel-item"><img src="chart1.png" alt="Data Chart 1 (Placeholder)"></div>
+                                    <div class="carousel-item"><img src="chart2.png" alt="Data Chart 2 (Placeholder)"></div>
+                                    <div class="carousel-item"><img src="chart3.png" alt="Data Chart 3 (Placeholder)"></div>
+                                </div>
+                                <button class="carousel-button left" onclick="prevSlide('chart')">❮</button>
+                                <button class="carousel-button right" onclick="nextSlide('chart')">❯</button>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-3 text-center">Key Data Analysis and Visualization</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="max-w-5xl mx-auto px-4">
+                <div class="flex flex-wrap justify-center gap-4 mb-8">
+                    <button id="btn-smart-qa" class="feature-button bg-white text-gray-800 px-6 py-3 rounded-full shadow-md hover:shadow-lg active">Intelligent Q&A Module</button>
+                    <button id="btn-data-analysis" class="feature-button bg-white text-gray-800 px-6 py-3 rounded-full shadow-md hover:shadow-lg">Data Analysis Module</button>
+                    <button id="btn-dashboard" class="feature-button bg-white text-gray-800 px-6 py-3 rounded-full shadow-md hover:shadow-lg">Dashboard Module</button>
+                </div>
+
+                <div id="content-smart-qa" class="feature-content active bg-white p-8 rounded-xl shadow-lg border-t-4 accent-border fade-in visible">
+                    <h3 class="text-2xl font-bold highlight-text mb-4">Intelligent Q&A Module</h3>
+                    <ul class="list-disc list-inside text-gray-700 space-y-2">
+                        <li>Implemented <strong>dual-mode query system</strong> (fast response mode vs best quality mode).</li>
+                        <li>Integrated <strong>multi-modal RAG retrieval technology</strong>, combining vector database retrieval, knowledge graph queries, and AI reasoning engine.</li>
+                        <li>Through GPT model's <strong>deep analysis and intelligent generation</strong> of retrieval results, ensuring <strong>accuracy and traceability</strong> of answers.</li>
+                    </ul>
+                    <h4 class="text-xl font-semibold text-gray-800 mt-6 mb-3">RAG Internal Workflow</h4>
+                    <div class="rag-workflow-diagram">
+                        <div class="rag-step-box">Document Input</div>
+                        <div class="rag-arrow"></div>
+                        <div class="rag-step-box">Document Segmentation</div>
+                        <div class="rag-arrow"></div>
+                        <div class="rag-step-box">Text Embedding</div>
+                        <div class="rag-arrow"></div>
+                        <div class="rag-step-box">Vector Database Storage</div>
+                        <div class="rag-arrow"></div>
+                        <div class="rag-step-box">Knowledge Graph Construction</div>
+                        <div class="rag-arrow"></div>
+                        <div class="rag-step-box">Entity Relationship Extraction</div>
+                    </div>
+                    <div class="rag-workflow-diagram mt-4">
+                        <div class="rag-step-box">User Query</div>
+                        <div class="rag-arrow"></div>
+                        <div class="rag-step-box">Query Embedding</div>
+                        <div class="rag-arrow"></div>
+                        <div class="rag-step-box">Vector Retrieval</div>
+                        <div class="rag-arrow"></div>
+                        <div class="rag-step-box">Context Assembly</div>
+                        <div class="rag-arrow"></div>
+                        <div class="rag-step-box">LLM Generation</div>
+                        <div class="rag-arrow"></div>
+                        <div class="rag-step-box">Final Answer</div>
+                    </div>
+
+                    <h4 class="text-xl font-semibold text-gray-800 mt-6 mb-4">Query Mode Performance Conceptual Comparison</h4>
+                    <div class="chart-container">
+                        <canvas id="multiModeChart"></canvas>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-4 text-center">
+                        Conceptual comparison of different query modes in speed and answer comprehensiveness
+                    </p>
+                </div>
+
+                <div id="content-data-analysis" class="feature-content bg-white p-8 rounded-xl shadow-lg border-t-4 accent-border">
+                    <h3 class="text-2xl font-bold highlight-text mb-4">Data Analysis Module</h3>
+                    <ul class="list-disc list-inside text-gray-700 space-y-2">
+                        <li>Provides Token usage statistics and cost analysis.</li>
+                        <li>Provides mode comparison charts and knowledge graph visualization.</li>
+                        <li>Provides data-driven insight support for decision-making processes.</li>
+                    </ul>
+                    <h4 class="text-xl font-semibold text-gray-800 mt-6 mb-4">Token Usage and Cost Trends (Conceptual Data)</h4>
+                    <div class="chart-container">
+                        <canvas id="costMonitorChart"></canvas>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-4 text-center">
+                        Historical Token usage and cost trend examples.
+                    </p>
+                    <div class="flex justify-center mt-6">
+                        <span class="text-6xl text-gray-400" role="img" aria-label="Chart">📊</span>
+                    </div>
+                </div>
+
+                <div id="content-dashboard" class="feature-content bg-white p-8 rounded-xl shadow-lg border-t-4 accent-border">
+                    <h3 class="text-2xl font-bold highlight-text mb-4">Dashboard Module</h3>
+                    <ul class="list-disc list-inside text-gray-700 space-y-2">
+                        <li>Integrates system overview and quick navigation features.</li>
+                        <li>Provides user-friendly operation interface.</li>
+                    </ul>
+                    <div class="flex justify-center mt-6">
+                        <img src="dashboard.png" alt="Dashboard Screenshot" class="w-full h-auto rounded-md shadow-md" style="max-width: 1000px; display: block; margin: 0 auto;">
+                        <p class="text-sm text-gray-500 mt-2 text-center">Platform Dashboard Overview Diagram.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="users" class="py-20">
+            <div class="text-center mb-12 fade-in">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Who Will Benefit? Our Target Users</h2>
+                <p class="text-lg text-gray-600 mt-2">Tailored for Enterprise Project Management Professionals</p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+                <div class="user-card bg-white p-6 rounded-xl shadow-lg border-t-4 accent-border fade-in">
+                    <h3 class="text-xl font-bold highlight-text mb-3">Project Managers</h3>
+                    <ul class="text-gray-700 text-sm list-disc list-inside space-y-1">
+                        <li>Quick access to management advice and best practices.</li>
+                        <li>Deep understanding of project risks and opportunities.</li>
+                    </ul>
+                </div>
+                <div class="user-card bg-white p-6 rounded-xl shadow-lg border-t-4 accent-border fade-in">
+                    <h3 class="text-xl font-bold highlight-text mb-3">Business Analysts</h3>
+                    <ul class="text-gray-700 text-sm list-disc list-inside space-y-1">
+                        <li>Efficiently parse complex project documents.</li>
+                        <li>Obtain data-driven business insights.</li>
+                    </ul>
+                </div>
+                <div class="user-card bg-white p-6 rounded-xl shadow-lg border-t-4 accent-border fade-in">
+                    <h3 class="text-xl font-bold highlight-text mb-3">Technology & R&D Teams</h3>
+                    <ul class="text-gray-700 text-sm list-disc list-inside space-y-1">
+                        <li>Quickly query technical specifications and implementation details.</li>
+                        <li>Understand AI technology applications in projects.</li>
+                    </ul>
+                </div>
+                <div class="user-card bg-white p-6 rounded-xl shadow-lg border-t-4 accent-border fade-in">
+                    <h3 class="text-xl font-bold highlight-text mb-3">Senior Decision Makers</h3>
+                    <ul class="list-disc list-inside text-gray-700 text-sm space-y-1">
+                        <li>Obtain precise and explainable decision recommendations.</li>
+                        <li>Real-time monitoring of project status and key metrics.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="value" class="py-20 secondary-bg rounded-xl shadow-inner">
+            <div class="text-center mb-12 fade-in">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Why Choose Expert-AI Collaboration? Core Value</h2>
+                <p class="text-lg text-gray-600 mt-2">The Changes We Bring to You</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 accent-border fade-in">
+                    <h3 class="text-xl font-bold highlight-text mb-3">1. Enhanced Decision Efficiency</h3>
+                    <ul class="list-disc list-inside text-gray-700 text-sm space-y-1">
+                        <li>Real-time provision of precise decision recommendations, significantly reducing information search time.</li>
+                        <li>24/7 availability, breaking traditional working hour limitations.</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 accent-border fade-in">
+                    <h3 class="text-xl font-bold highlight-text mb-3">2. Ensured Decision Quality</h3>
+                    <ul class="list-disc list-inside text-gray-700 text-sm space-y-1">
+                        <li>Based on advanced RAG technology and GPT models, ensuring accuracy and traceability of answers.</li>
+                        <li>Multi-modal retrieval provides comprehensive and in-depth perspectives.</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 accent-border fade-in">
+                    <h3 class="text-xl font-bold highlight-text mb-3">3. Digital Transformation Achievement</h3>
+                    <ul class="list-disc list-inside text-gray-700 text-sm space-y-1">
+                        <li>Successfully achieved comprehensive digital transformation of enterprise project decision-making.</li>
+                        <li>Deep integration of AI with expert knowledge, enhancing enterprise intelligence level.</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 accent-border fade-in">
+                    <h3 class="text-xl font-bold highlight-text mb-3">4. Empowered Insights & Analysis</h3>
+                    <ul class="list-disc list-inside text-gray-700 text-sm space-y-1">
+                        <li>Provides Token usage statistics, cost analysis, and knowledge graph visualization.</li>
+                        <li>Provides powerful data-driven insight support for decision-making processes.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="future" class="py-20 text-center">
+            <div class="mb-12 fade-in">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Future Prospects</h2>
+                <p class="text-lg text-gray-600 mt-2">Project Potential Directions</p>
+            </div>
+            <div class="max-w-4xl mx-auto fade-in">
+                <div class="bg-white p-8 rounded-xl shadow-lg border-t-4 accent-border mb-8">
+                    <p class="text-gray-700 mb-4">
+                        This project will undergo continuous iteration, with future research focusing on the following three core aspects, aiming to further enhance the AI chatbot's performance, intelligence, and user experience:
+                    </p>
+                    <ul class="list-disc list-inside text-gray-700 mt-2 space-y-3 max-w-4xl mx-auto text-left">
+                        <li><strong>Reinforcement Learning-driven Answer Optimization</strong><br>
+                        This direction aims to enable the AI chatbot to autonomously learn and optimize its answer generation strategies by introducing Reinforcement Learning mechanisms. We will design multi-dimensional rewards (including factual accuracy, information completeness, conciseness, fluency, relevance, citation quality, and user feedback). A Reinforcement Learning Agent will be utilized for information selection, answer reconstruction, memory integration, and citation strategy learning, thereby comprehensively improving answer quality.</li>
+                        <li><strong>Machine Learning-driven Precise Citation</strong><br>
+                        This direction focuses on enhancing the intelligence and precision of answer citations, ensuring that every piece of information has a clear, verifiable source. We will leverage deep embeddings for semantic matching to achieve context-aware and intelligent citations. Research areas include intent recognition, cross-document linking, granularity prediction, and citation style generation, ensuring the professionalism and traceability of references.</li>
+                        <li><strong>Intelligent Memory Integration</strong><br>
+                        This direction aims to elevate the chatbot's "memory" capabilities, enabling it to more effectively utilize historical information to enhance answer quality and conversational coherence. We will construct memory as a controllable knowledge base (including long-term conversational context, user preferences, and project-specific rules). Through advanced encoding, dynamic retrieval, and gating mechanisms, we will achieve intelligent memory fusion, thereby generating more personalized and coherent answers.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-100 py-8 text-center text-gray-600 text-sm">
+        <p>Acknowledgments: Thanks to <strong>Professor Jennifer Whyte</strong>, <strong>Dr. Wei-Ting Hong</strong>, and <strong>Dr. Jin XUE</strong> for academic guidance.</p>
+        <p>Thanks to <strong>OpenAI</strong> for providing GPT-4 model technical support, and to <strong>Hong Kong University of Science and Technology</strong>'s LightRAG open-source project for technical contributions.</p>
+        <p>&copy; 2025 <strong>Jiarui Zhang</strong>. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Image Slider Logic (Re-implemented for horizontal scroll within each section)
+        const sliders = {
+            'kb': {
+                wrapperElement: document.getElementById('kbCarousel'),
+                innerElement: null,
+                images: [],
+                currentIndex: 0
+            },
+            'chat': {
+                wrapperElement: document.getElementById('chatCarousel'),
+                innerElement: null,
+                images: [],
+                currentIndex: 0
+            },
+            'chart': {
+                wrapperElement: document.getElementById('chartCarousel'),
+                innerElement: null,
+                images: [],
+                currentIndex: 0
+            }
+        };
+
+        function initializeSliders() {
+            for (const key in sliders) {
+                const slider = sliders[key];
+                if (slider.wrapperElement) {
+                    slider.innerElement = slider.wrapperElement.querySelector('.carousel-inner');
+                    slider.images = Array.from(slider.innerElement.children);
+                    slider.currentIndex = 0;
+                    updateSliderPosition(slider);
+                }
+            }
+        }
+
+        function updateSliderPosition(slider) {
+            if (slider.innerElement && slider.images.length > 0) {
+                const offset = -slider.currentIndex * 100;
+                slider.innerElement.style.transform = `translateX(${offset}%)`;
+            }
+        }
+
+        function changeSlide(sliderKey, direction) {
+            const slider = sliders[sliderKey];
+            if (!slider || !slider.images || slider.images.length === 0) return;
+
+            slider.currentIndex += direction;
+            if (slider.currentIndex >= slider.images.length) {
+                slider.currentIndex = 0;
+            } else if (slider.currentIndex < 0) {
+                slider.currentIndex = slider.images.length - 1;
+            }
+            updateSliderPosition(slider);
+        }
+
+        function nextSlide(sliderKey) {
+            changeSlide(sliderKey, 1);
+        }
+
+        function prevSlide(sliderKey) {
+            changeSlide(sliderKey, -1);
+        }
+
+        // Mobile menu functions
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('hidden');
+        }
+        
+        function closeMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.add('hidden');
+        }
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const menuButton = event.target.closest('button');
+            
+            if (!mobileMenu.contains(event.target) && !menuButton) {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSliders(); // Initialize all sliders
+
+            // Fade-in on scroll logic
+            const faders = document.querySelectorAll('.fade-in');
+            const appearOptions = {
+                threshold: 0.1
+            };
+            const appearOnScroll = new IntersectionObserver(function(entries, appearOnScroll) {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) {
+                        return;
+                    } else {
+                        entry.target.classList.add('visible');
+                        appearOnScroll.unobserve(entry.target);
+                    }
+                });
+            });
+            faders.forEach(fader => {
+                appearOnScroll.observe(fader);
+            });
+
+            // Feature tab switching logic
+            const featureButtons = document.querySelectorAll('.feature-button');
+            const featureContents = document.querySelectorAll('.feature-content');
+
+            featureButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active from all buttons and contents
+                    featureButtons.forEach(btn => btn.classList.remove('active'));
+                    featureContents.forEach(content => content.classList.remove('active', 'visible')); // Also remove visible for re-fade-in
+
+                    // Add active to clicked button
+                    this.classList.add('active');
+
+                    // Show corresponding content with fade-in
+                    const targetId = this.id.replace('btn-', 'content-');
+                    const targetContent = document.getElementById(targetId);
+                    if (targetContent) {
+                        targetContent.classList.add('active');
+                        // Trigger reflow to restart fade-in animation
+                        void targetContent.offsetWidth;
+                        targetContent.classList.add('visible');
+                    }
+                });
+            });
+
+            // Chart.js initialization
+            function createChart(chartId, type, data, options) {
+                const ctx = document.getElementById(chartId);
+                if (ctx) {
+                    new Chart(ctx, {
+                        type: type,
+                        data: data,
+                        options: options
+                    });
+                }
+            }
+
+            // Chart 1: AI-Powered vs Traditional Mode Efficiency Comparison (Bar Chart)
+            const resourceShiftData = {
+                labels: ['Traditional Mode', 'AI-Powered Platform'],
+                datasets: [{
+                    label: 'Information Processing Efficiency (Relative)',
+                    data: [30, 90], /* Conceptual data: AI is more efficient */
+                    backgroundColor: ['#1E6E73', '#0A4740'], /* Softer Teal, Dark Teal */
+                    borderColor: ['#1E6E73', '#0A4740'],
+                    borderWidth: 1
+                }]
+            };
+
+            const resourceShiftOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Efficiency Index'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                    },
+                    title: {
+                        display: false,
+                        text: 'AI-Powered vs Traditional Mode Efficiency Comparison'
+                    }
+                }
+            };
+            createChart('resourceShiftChart', 'bar', resourceShiftData, resourceShiftOptions);
+
+            // Chart 2: Multi-Mode Chart (Line Chart)
+            const multiModeData = {
+                labels: ['Mode 1 (Fast)', 'Mode 2 (Best)'],
+                datasets: [{
+                    label: 'Response Speed (s)',
+                    data: [0.5, 3], /* Conceptual data: Fast mode is faster */
+                    borderColor: '#0A4740',
+                    backgroundColor: 'rgba(10, 71, 64, 0.2)',
+                    fill: false,
+                    tension: 0.1,
+                    yAxisID: 'y-speed'
+                }, {
+                    label: 'Answer Comprehensiveness (Score)',
+                    data: [70, 95], /* Conceptual data: Best mode is more comprehensive */
+                    borderColor: '#1E6E73',
+                    backgroundColor: 'rgba(30, 110, 115, 0.2)',
+                    fill: false,
+                    tension: 0.1,
+                    yAxisID: 'y-completeness'
+                }]
+            };
+
+            const multiModeOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    'y-speed': {
+                        type: 'linear',
+                        position: 'left',
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Response Speed (seconds)'
+                        }
+                    },
+                    'y-completeness': {
+                        type: 'linear',
+                        position: 'right',
+                        beginAtZero: true,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: 'Answer Comprehensiveness (Score)'
+                        },
+                        grid: {
+                            drawOnChartArea: false, // only draw grid lines for this axis
+                        },
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                    },
+                    title: {
+                        display: false,
+                        text: 'Query Mode Performance Conceptual Comparison'
+                    }
+                }
+            };
+            createChart('multiModeChart', 'line', multiModeData, multiModeOptions);
+
+            // Chart 3: Cost Monitor Chart (Line Chart)
+            const costMonitorData = {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Token Usage (Million)',
+                    data: [0.5, 0.7, 1.2, 1.5, 1.3, 1.8],
+                    borderColor: '#0A4740',
+                    backgroundColor: 'rgba(10, 71, 64, 0.2)',
+                    fill: true,
+                    tension: 0.3
+                }, {
+                    label: 'Estimated Cost ($)',
+                    data: [10, 14, 24, 30, 26, 36],
+                    borderColor: '#1E6E73',
+                    backgroundColor: 'rgba(30, 110, 115, 0.2)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            };
+
+            const costMonitorOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Quantity / Cost'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                    },
+                    title: {
+                        display: false,
+                        text: 'Token Usage and Cost Trends'
+                    }
+                }
+            };
+            createChart('costMonitorChart', 'line', costMonitorData, costMonitorOptions);
+        });
+    </script>
+</body>
+</html>
