@@ -200,19 +200,18 @@
                 hyphens: auto;
             }
             
-            /* Optimize carousel for mobile - show full images with zoom capability */
+            /* Optimize carousel for mobile - fill container with zoom capability */
             .carousel-wrapper {
                 height: 400px; /* Increased height for better image display */
                 margin: 1rem 0;
             }
             
             .carousel-item img {
-                object-fit: contain; /* Show full image without cropping */
+                object-fit: cover; /* Fill the container completely */
                 width: 100%;
                 height: 100%;
                 border-radius: 0.5rem;
-                max-height: 100%;
-                max-width: 100%;
+                transition: transform 0.3s ease;
             }
             
             .carousel-button {
@@ -332,12 +331,11 @@
             }
             
             .carousel-item img {
-                object-fit: contain; /* Show full image without cropping */
+                object-fit: cover; /* Fill the container completely */
                 width: 100%;
                 height: 100%;
                 border-radius: 0.5rem;
-                max-height: 100%;
-                max-width: 100%;
+                transition: transform 0.3s ease;
             }
             
             .text-4xl {
@@ -904,19 +902,26 @@
         // Image zoom functionality for mobile
         function addImageZoom() {
             const carouselImages = document.querySelectorAll('.carousel-item img');
-            carouselImages.forEach(img => {
+            console.log('Found', carouselImages.length, 'carousel images for zoom');
+            
+            carouselImages.forEach((img, index) => {
                 let currentScale = 1;
                 let startDistance = 0;
                 let startScale = 1;
+                let lastTap = 0;
+                
+                console.log('Setting up zoom for image', index);
                 
                 // Touch events for zoom
                 img.addEventListener('touchstart', function(e) {
+                    console.log('Touch start:', e.touches.length, 'fingers');
                     if (e.touches.length === 2) {
                         startDistance = Math.hypot(
                             e.touches[0].clientX - e.touches[1].clientX,
                             e.touches[0].clientY - e.touches[1].clientY
                         );
                         startScale = currentScale;
+                        console.log('Two finger touch - start distance:', startDistance);
                     }
                 });
                 
@@ -928,29 +933,41 @@
                             e.touches[0].clientY - e.touches[1].clientY
                         );
                         const scale = (distance / startDistance) * startScale;
-                        currentScale = Math.min(Math.max(scale, 0.5), 3); // Limit zoom between 0.5x and 3x
+                        currentScale = Math.min(Math.max(scale, 0.5), 3);
                         img.style.transform = `scale(${currentScale})`;
+                        console.log('Zoom scale:', currentScale);
                     }
                 });
                 
                 img.addEventListener('touchend', function(e) {
+                    console.log('Touch end:', e.touches.length, 'fingers remaining');
                     if (e.touches.length < 2) {
                         startDistance = 0;
                         startScale = 1;
                     }
-                });
-                
-                // Double tap to reset zoom
-                let lastTap = 0;
-                img.addEventListener('touchend', function(e) {
+                    
+                    // Double tap to reset zoom
                     const currentTime = new Date().getTime();
                     const tapLength = currentTime - lastTap;
                     if (tapLength < 500 && tapLength > 0) {
-                        // Double tap detected
+                        console.log('Double tap detected - resetting zoom');
                         currentScale = 1;
                         img.style.transform = 'scale(1)';
                     }
                     lastTap = currentTime;
+                });
+                
+                // Single tap to toggle zoom
+                img.addEventListener('click', function(e) {
+                    if (e.touches && e.touches.length > 0) return; // Skip if touch event
+                    console.log('Single click - toggling zoom');
+                    if (currentScale === 1) {
+                        currentScale = 2;
+                        img.style.transform = 'scale(2)';
+                    } else {
+                        currentScale = 1;
+                        img.style.transform = 'scale(1)';
+                    }
                 });
             });
         }
